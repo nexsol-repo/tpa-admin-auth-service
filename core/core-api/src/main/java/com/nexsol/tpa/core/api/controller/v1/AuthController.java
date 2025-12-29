@@ -1,6 +1,7 @@
 package com.nexsol.tpa.core.api.controller.v1;
 
 import com.nexsol.tpa.core.api.controller.v1.request.LoginRequest;
+import com.nexsol.tpa.core.api.controller.v1.request.RegisterRequest;
 import com.nexsol.tpa.core.domain.AdminAuthService;
 import com.nexsol.tpa.core.support.response.ApiResponse;
 import lombok.RequiredArgsConstructor;
@@ -22,5 +23,19 @@ public class AuthController {
 
         return ApiResponse.success(token);
     }
+
+
+    @PostMapping("/register")
+    public ApiResponse<Long> register(@RequestBody RegisterRequest request) {
+        Long userId = adminAuthService.register(
+                request.loginId(),
+                request.password(),
+                request.name(),
+                request.role(),
+                request.serviceType()
+        );
+        return ApiResponse.success(userId);
+    }
+
 
 }

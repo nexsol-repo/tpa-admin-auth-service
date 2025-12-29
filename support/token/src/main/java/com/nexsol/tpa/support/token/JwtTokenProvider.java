@@ -6,8 +6,7 @@ import org.springframework.stereotype.Component;
 
 import javax.crypto.SecretKey;
 import java.nio.charset.StandardCharsets;
-import java.util.Date;
-import java.util.Map;
+import java.util.*;
 
 @Component
 public class JwtTokenProvider {
@@ -21,35 +20,36 @@ public class JwtTokenProvider {
         this.key = Keys.hmacShaKeyFor(jwtProperties.secret().getBytes(StandardCharsets.UTF_8));
     }
 
-    public String generate(Long id, String role, Map<String, Object> claims) {
+    public String generate(Long id, String role, Set<String> serviceTypes, Map<String, Object> claims) {
         long now = System.currentTimeMillis();
         Date validity = new Date(now + (jwtProperties.expirationSeconds() * 1000));
 
+        Map<String, Object> finalClaims = new HashMap<>(claims);
+        finalClaims.put("role", role);
+        if (serviceTypes != null && !serviceTypes.isEmpty()) {
+            finalClaims.put("scope", String.join(",", serviceTypes));
+        }
+
         return Jwts.builder()
-            .subject(String.valueOf(id))
-            .claim("role", role)
-            .claims(claims)
-            .issuer(jwtProperties.issuer())
-            .issuedAt(new Date(now))
-            .expiration(validity)
-            .signWith(key, Jwts.SIG.HS512)
-            .compact();
+                .subject(String.valueOf(id))
+                .claims(finalClaims)
+                .issuer(jwtProperties.issuer())
+                .issuedAt(new Date(now))
+                .expiration(validity)
+                .signWith(key, Jwts.SIG.HS512)
+                .compact();
     }
 
     private Claims parseClaims(String token) {
         try {
             return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
-        }
-        catch (SecurityException | MalformedJwtException e) {
+        } catch (SecurityException | MalformedJwtException e) {
             throw new IllegalArgumentException("잘못된 JWT 서명입니다.");
-        }
-        catch (ExpiredJwtException e) {
+        } catch (ExpiredJwtException e) {
             throw new IllegalArgumentException("만료된 JWT 토큰입니다.");
-        }
-        catch (UnsupportedJwtException e) {
+        } catch (UnsupportedJwtException e) {
             throw new IllegalArgumentException("지원되지 않는 JWT 토큰입니다.");
-        }
-        catch (IllegalArgumentException e) {
+        } catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("JWT 토큰이 잘못되었습니다.");
         }
     }
@@ -65,6 +65,15 @@ public class JwtTokenProvider {
 
     public String getRole(String token) {
         return parseClaims(token).get("role", String.class);
+    }
+
+    public Set<String> getScope(String token) {
+        String scopeString = parseClaims(token).get("scope", String.class);
+        if (scopeString == null || scopeString.isEmpty()) {
+            return Collections.emptySet();
+        }
+
+        return Set.of(scopeString.split(","));
     }
 
 }

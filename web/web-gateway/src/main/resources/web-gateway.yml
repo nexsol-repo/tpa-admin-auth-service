@@ -1,0 +1,44 @@
+server:
+  port: 8080 # 내부 포트 고정
+
+spring:
+  cloud:
+    gateway:
+      routes:
+        - id: auth-service
+          uri: ${AUTH_SERVICE_URL} # 환경변수 사용 권장 (http://auth:8081)
+          predicates:
+            - Path=/v1/admin/auth/**
+
+        - id: pungsu-service
+          uri: ${PUNGSU_SERVICE_URL} # 환경변수 사용 권장 (http://host.docker.internal...)
+          predicates:
+            - Path=/v1/admin/pungsu/**
+          filters:
+            - name: ScopeCheck
+              args:
+                requiredScope: PUNGSU
+
+        - id: solar-service
+          uri: ${SOLAR_SERVICE_URL}
+          predicates:
+            - Path=/v1/admin/solar/**
+          filters:
+            - name: ScopeCheck
+              args:
+                requiredScope: SOLAR
+
+jwt:
+  secret: ${JWT_SECRET}
+  expiration-seconds: 36000
+  issuer: "nexsol-admin"
+
+# [추가] Actuator 설정 (헬스체크 노출)
+management:
+  endpoints:
+    web:
+      exposure:
+        include: health
+  endpoint:
+    health:
+      show-details: always

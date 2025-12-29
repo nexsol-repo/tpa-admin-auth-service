@@ -19,3 +19,5 @@ include 'support:monitoring'
 include 'support:security'
 include 'support:token'
 include 'web:web-auth'
+include 'web:web-gateway'
+

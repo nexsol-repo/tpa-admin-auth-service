@@ -1,0 +1,44 @@
+services:
+  # 1. Auth Service (내부망 전용)
+  auth:
+    image: ${AUTH_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}-auth
+    restart: always
+    env_file:
+      - .env
+    environment:
+      - TZ=Asia/Seoul
+      - SERVER_PORT=8081 # 내부 포트
+      - SPRING_PROFILES_ACTIVE=${TARGET_ENV}
+      - STORAGE_DATASOURCE_CORE_JDBC_URL=${DB_URL}
+      - STORAGE_DATASOURCE_CORE_USERNAME=${DB_USERNAME}
+      - STORAGE_DATASOURCE_CORE_PASSWORD=${DB_PASSWORD}
+      - JWT_SECRET=${JWT_SECRET}
+    # 호스트 포트 매핑 제거 (보안 강화: Gateway를 통해서만 접근 가능)
+    # 굳이 필요하다면 ports: - "${AUTH_HOST_PORT}:8081"
+
+  # 2. Gateway Service (외부 노출)
+  gateway:
+    image: ${GATEWAY_IMAGE}
+    container_name: ${COMPOSE_PROJECT_NAME}-gateway
+    restart: always
+    env_file:
+      - .env
+    ports:
+      - "127.0.0.1:${HOST_PORT}:8080" # Nginx가 연결할 포트 (8083 or 8084)
+    environment:
+      - TZ=Asia/Seoul
+      - SERVER_PORT=8080
+      - SPRING_PROFILES_ACTIVE=${TARGET_ENV}
+      - JWT_SECRET=${JWT_SECRET}
+      - AUTH_SERVICE_URL=http://auth:8081
+      # 다른 서비스들 주소 (env나 하드코딩 필요)
+      - PUNGSU_SERVICE_URL=http://host.docker.internal:80/upstream/pungsu
+      # - SOLAR_SERVICE_URL=http://host.docker.internal:80/upstream/solar
+    depends_on:
+      - auth
+    healthcheck:
+      test: ["CMD", "curl", "-f", "http://localhost:8080/actuator/health"]
+      interval: 10s
+      timeout: 5s
+      retries: 3

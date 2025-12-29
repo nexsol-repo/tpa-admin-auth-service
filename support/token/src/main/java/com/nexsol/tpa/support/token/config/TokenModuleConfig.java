@@ -6,7 +6,7 @@ import org.springframework.context.annotation.ComponentScan;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
-@ComponentScan // 현재 패키지의 Component(Provider) 스캔
+@ComponentScan(basePackages = "com.nexsol.tpa.support.token")
 @EnableConfigurationProperties(JwtProperties.class)
 public class TokenModuleConfig {
 

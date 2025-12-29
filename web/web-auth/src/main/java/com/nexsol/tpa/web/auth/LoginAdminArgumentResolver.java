@@ -1,7 +1,7 @@
 package com.nexsol.tpa.web.auth;
 
-import ch.qos.logback.core.util.StringUtil;
-import com.nexsol.tpa.support.token.JwtTokenProvider;
+
+import com.nexsol.tpa.core.enums.ServiceType;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -14,16 +14,14 @@ import org.springframework.web.context.request.NativeWebRequest;
 import org.springframework.web.method.support.HandlerMethodArgumentResolver;
 import org.springframework.web.method.support.ModelAndViewContainer;
 
+import java.util.HashSet;
+import java.util.Set;
+
 @Slf4j
 @Component
 @RequiredArgsConstructor
 public class LoginAdminArgumentResolver implements HandlerMethodArgumentResolver {
 
-    private final JwtTokenProvider jwtTokenProvider;
-
-    private static final String AUTHORIZATION_HEADER = "Authorization";
-
-    private static final String BEARER_PREFIX = "Bearer ";
 
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
@@ -34,25 +32,37 @@ public class LoginAdminArgumentResolver implements HandlerMethodArgumentResolver
 
     @Override
     public @Nullable Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-            NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+                                            NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
-        String token = resolveToken(request);
 
-        jwtTokenProvider.validateToken(token);
+        String userIdHeader = request.getHeader("X-User-Id");
+        String roleHeader = request.getHeader("X-User-Role");
+        String scopeHeader = request.getHeader("X-User-Scope");
 
-        Long userId = jwtTokenProvider.getUserId(token);
-        String role = jwtTokenProvider.getRole(token);
-
-        return new AdminUserProvider(userId, role);
-    }
-
-    private String resolveToken(HttpServletRequest request) {
-        String bearerToken = request.getHeader(AUTHORIZATION_HEADER);
-        if (StringUtils.hasText(bearerToken) && bearerToken.startsWith(BEARER_PREFIX)) {
-            return bearerToken.substring(7);
+        if (!StringUtils.hasText(userIdHeader)) {
+            log.warn("인증 헤더가 없습니다. Gateway를 확인해주세요URI: {}", request.getRequestURI());
+            return null;
         }
 
-        throw new IllegalArgumentException("Invalid Authorization header");
+        Long userId = Long.parseLong(userIdHeader);
+        String role = roleHeader;
+
+        Set<ServiceType> serviceTypes = new HashSet<>();
+        if (StringUtils.hasText(scopeHeader)) {
+            String[] scopes = scopeHeader.split(",");
+            for (String scope : scopes) {
+                try {
+                    serviceTypes.add(ServiceType.valueOf(scope.trim()));
+                } catch (IllegalArgumentException e) {
+                    log.warn("Unknown ServiceType in header: {}", scope);
+                }
+            }
+        }
+
+        return new AdminUserProvider(userId, role, serviceTypes);
+
+
     }
+
 
 }
