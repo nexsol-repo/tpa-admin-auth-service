@@ -1,5 +1,5 @@
 spring.application.name: core-api
-spring.profiles.active: local
+spring.profiles.active: local-dev
 
 spring:
   config:
@@ -7,7 +7,6 @@ spring:
       - monitoring.yml
       - logging.yml
       - db-core.yml
-      - client-example.yml
   web.resources.add-mappings: false
 
 server:
@@ -16,6 +15,10 @@ server:
     threads:
       max: 600
       min-spare: 100
+jwt:
+ secret: {JWT_SECRET}
+ expiration-seconds: 3600
+ issuer: "nexsol-admin"
 
 ---
 spring.config.activate.on-profile: local

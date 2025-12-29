@@ -1,23 +1,22 @@
 package com.nexsol.tpa.core.support.response;
 
-import com.nexsol.tpa.core.support.error.ErrorMessage;
-import com.nexsol.tpa.core.support.error.ErrorType;
+import com.nexsol.tpa.core.error.CoreErrorType;
+import com.nexsol.tpa.core.support.error.CoreApiErrorMessage;
+import lombok.AccessLevel;
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
 
+@Getter
+@RequiredArgsConstructor(access = AccessLevel.PRIVATE)
 public class ApiResponse<S> {
 
     private final ResultType result;
 
     private final S data;
 
-    private final ErrorMessage error;
+    private final CoreApiErrorMessage error;
 
-    private ApiResponse(ResultType result, S data, ErrorMessage error) {
-        this.result = result;
-        this.data = data;
-        this.error = error;
-    }
-
-    public static ApiResponse<?> success() {
+    public static ApiResponse<Object> success() {
         return new ApiResponse<>(ResultType.SUCCESS, null, null);
     }
 
@@ -25,24 +24,12 @@ public class ApiResponse<S> {
         return new ApiResponse<>(ResultType.SUCCESS, data, null);
     }
 
-    public static ApiResponse<?> error(ErrorType error) {
-        return new ApiResponse<>(ResultType.ERROR, null, new ErrorMessage(error));
+    public static <S> ApiResponse<S> error(CoreErrorType error) {
+        return new ApiResponse<>(ResultType.ERROR, null, new CoreApiErrorMessage(error, null));
     }
 
-    public static ApiResponse<?> error(ErrorType error, Object errorData) {
-        return new ApiResponse<>(ResultType.ERROR, null, new ErrorMessage(error, errorData));
-    }
-
-    public ResultType getResult() {
-        return result;
-    }
-
-    public Object getData() {
-        return data;
-    }
-
-    public ErrorMessage getError() {
-        return error;
+    public static <S> ApiResponse<S> error(CoreErrorType error, Object errorData) {
+        return new ApiResponse<>(ResultType.ERROR, null, new CoreApiErrorMessage(error, errorData));
     }
 
 }

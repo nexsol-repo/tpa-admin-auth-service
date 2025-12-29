@@ -2,4 +2,7 @@ dependencies {
     api project(":core:core-enum")
     compileOnly 'org.springframework:spring-context'
     compileOnly 'jakarta.transaction:jakarta.transaction-api'
+
+    implementation project(':support:token')
+    implementation project(':support:security')
 }
