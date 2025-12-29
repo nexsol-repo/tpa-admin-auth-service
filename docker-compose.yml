@@ -2,6 +2,7 @@ services:
   # 1. Auth Service (내부망 전용)
   auth:
     image: ${AUTH_IMAGE}
+    pull_policy: never
     container_name: ${COMPOSE_PROJECT_NAME}-auth
     restart: always
     env_file:
@@ -20,6 +21,7 @@ services:
   # 2. Gateway Service (외부 노출)
   gateway:
     image: ${GATEWAY_IMAGE}
+    pull_policy: never
     container_name: ${COMPOSE_PROJECT_NAME}-gateway
     restart: always
     env_file:

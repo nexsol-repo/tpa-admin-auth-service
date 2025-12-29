@@ -54,19 +54,19 @@ docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME up -d
 
 # 4. Health Check
 echo "🏥 Gateway 헬스체크: http://127.0.0.1:${TARGET_PORT}/actuator/health"
-for i in {1..20}; do
+for i in {1..5}; do
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:${TARGET_PORT}/actuator/health)
   if [ "$STATUS" == "200" ]; then
     echo "✅ 헬스체크 성공!"
     break
   fi
-  echo "⏳ 대기 중... ($i/20) - HTTP: $STATUS"
+  echo "⏳ 대기 중... ($i/5) - HTTP: $STATUS"
   sleep 5
 
   if [ $i -eq 20 ]; then
     echo "❌ 배포 실패. 롤백을 위해 신규 컨테이너를 제거합니다."
     docker logs ${COMPOSE_PROJECT_NAME}-gateway --tail 50
-    docker compose -p $COMPOSE_PROJECT_NAME down
+    docker compose -p $COMPOSE_PROJECT_NAME down || true
     exit 1
   fi
 done
