@@ -1,9 +1,10 @@
 #!/bin/bash
 
-# 사용법: ./deploy.sh prod
+# 사용법: ./deploy.sh [prod]
 TARGET_ENV=$1
 APP_NAME="tpa-gateway"
-ROUTE_PATH="/admin/" # Nginx에서 Gateway로 보낼 경로
+ROUTE_PATH="/admin/"
+# CI/CD env.DEPLOY_PATH와 일치해야 함
 BASE_PATH="/home/nex3/app/tpa-admin-auth-api"
 
 if [ "$TARGET_ENV" != "prod" ]; then
@@ -14,7 +15,7 @@ fi
 # Prod 환경 설정
 ENV_FILE=".env.prod"
 NGINX_CONF="/etc/nginx/conf.d/tpa-admin-api.conf"
-DEFAULT_PORT="8095" # Gateway Prod 포트 A
+DEFAULT_PORT="8095"
 
 echo "🚀 ${APP_NAME} (PROD) 배포 시작..."
 
@@ -32,9 +33,10 @@ if [ -f "$CURRENT_PORT_FILE" ]; then
     CURRENT_PORT=$(cat "$CURRENT_PORT_FILE")
 else
     CURRENT_PORT="$DEFAULT_PORT"
+    # 최초 배포 시 파일 생성
+    echo "$DEFAULT_PORT" > "$CURRENT_PORT_FILE"
 fi
 
-# 포트 스위칭 (8095 <-> 8096)
 if [ "$CURRENT_PORT" == "8095" ]; then
     TARGET_PORT="8096"
 else
@@ -45,29 +47,37 @@ echo "🔄 Gateway 포트 스위칭: ${CURRENT_PORT} -> ${TARGET_PORT}"
 # 3. 컨테이너 기동
 export HOST_PORT=$TARGET_PORT
 export TARGET_ENV="prod"
+# [중요] ci_cd.yml에서 빌드한 태그와 정확히 일치해야 함
 export AUTH_IMAGE="tpa-admin-auth:prod"
 export GATEWAY_IMAGE="tpa-admin-gateway:prod"
 export COMPOSE_PROJECT_NAME="${APP_NAME}-prod-${TARGET_PORT}"
 
 echo "📦 컨테이너 세트 기동: ${COMPOSE_PROJECT_NAME}"
+
+# docker-compose가 실패하면 스크립트 즉시 종료
 docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME up -d || {
-    echo "❌ Docker Compose 실행 실패!"
+    echo "❌ Docker Compose 실행 실패! 이미지가 존재하는지 확인하세요."
     exit 1
 }
 
 # 4. Health Check
 echo "🏥 Gateway 헬스체크: http://127.0.0.1:${TARGET_PORT}/actuator/health"
-for i in {1..5}; do
+RETRIES=10
+# bash 쉘 호환성을 위해 seq 사용
+for i in $(seq 1 $RETRIES); do
+  # HTTP 상태 코드만 가져옴
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:${TARGET_PORT}/actuator/health)
+
   if [ "$STATUS" == "200" ]; then
     echo "✅ 헬스체크 성공!"
     break
   fi
-  echo "⏳ 대기 중... ($i/5) - HTTP: $STATUS"
+
+  echo "⏳ 대기 중... ($i/$RETRIES) - HTTP: $STATUS"
   sleep 5
 
-  if [ $i -eq 20 ]; then
-    echo "❌ 배포 실패. 롤백을 위해 신규 컨테이너를 제거합니다."
+  if [ $i -eq $RETRIES ]; then
+    echo "❌ 헬스체크 실패. 롤백을 위해 신규 컨테이너를 제거합니다."
     docker logs ${COMPOSE_PROJECT_NAME}-gateway --tail 50
     docker compose -p $COMPOSE_PROJECT_NAME down || true
     exit 1
@@ -76,7 +86,7 @@ done
 
 # 5. Nginx 트래픽 전환
 echo "🔄 Nginx 설정을 업데이트합니다..."
-# /admin/ 경로의 proxy_pass 포트 변경
+# sudo 권한 문제 해결 전제하에 실행 (visudo 설정 필요)
 sudo sed -i "/location ${ROUTE_PATH//\//\\/}/,/}/ s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/" $NGINX_CONF
 sudo nginx -t && sudo nginx -s reload
 

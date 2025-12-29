@@ -21,23 +21,27 @@ jobs:
 
       - name: Build Docker Images
         run: |
+          echo "🐳 Building Docker Images with tag 'prod'..."
+          
           # 1. Auth Image Build
-          docker build -t tpa-admin-auth:prod -f Dockerfile-auth .
+          docker build -t ${{ env.AUTH_IMAGE_NAME }}:prod -f Dockerfile.auth .
           
           # 2. Gateway Image Build
-          docker build -t tpa-admin-gateway:prod  -f Dockerfile-gateway .
+          docker build -t ${{ env.GATEWAY_IMAGE_NAME }}:prod -f Dockerfile.gateway .
 
       - name: Prepare & Execute Deployment
         run: |
+          echo "📂 Preparing deployment directory..."
           mkdir -p ${{ env.DEPLOY_PATH }}
           
           cp docker-compose.yml ${{ env.DEPLOY_PATH }}/
           cp scripts/deploy.sh ${{ env.DEPLOY_PATH }}/
           chmod +x ${{ env.DEPLOY_PATH }}/deploy.sh
           
-          TARGET_ENV="dev"
-          [[ "${{ github.ref_name }}" == "main" ]] && TARGET_ENV="prod"
+          # 환경 변수 설정 (prod 고정)
+          TARGET_ENV="prod"
           
+          echo "🚀 Executing deploy.sh for $TARGET_ENV..."
           cd ${{ env.DEPLOY_PATH }}
           ./deploy.sh $TARGET_ENV
 
