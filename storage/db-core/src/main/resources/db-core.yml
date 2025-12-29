@@ -45,7 +45,7 @@ storage:
   datasource:
     core:
       driver-class-name: org.mariadb.jdbc.Driver
-      jdbc-url: jdbc:mariadb://${DB_URL}
+      jdbc-url: ${DB_URL}
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       maximum-pool-size: 5
@@ -65,7 +65,7 @@ storage:
   datasource:
     core:
       driver-class-name: org.mariadb.jdbc.Driver
-      jdbc-url: jdbc:mariadb://${DB_URL}
+      jdbc-url: ${DB_URL}
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       maximum-pool-size: 5
@@ -112,7 +112,7 @@ storage:
   datasource:
     core:
       driver-class-name: org.mariadb.jdbc.Driver
-      jdbc-url: jdbc:mariadb://${DB_URL}
+      jdbc-url: ${DB_URL}
       username: ${DB_USERNAME}
       password: ${DB_PASSWORD}
       maximum-pool-size: 5
