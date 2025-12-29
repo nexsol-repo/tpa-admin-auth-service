@@ -1,3 +1,6 @@
+bootJar.enabled = true
+jar.enabled = false
+
 dependencies {
     implementation project(':support:token')
     implementation 'org.springframework.cloud:spring-cloud-starter-gateway:4.3.3'
