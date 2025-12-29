@@ -23,27 +23,24 @@ jobs:
         run: |
           echo "🐳 Building Docker Images with tag 'prod'..."
           
-          # 1. Auth Image Build
+          # [수정] 파일명 하이픈(-) 확인: Dockerfile-auth
+          # [수정] 태그 prod로 고정
           docker build -t ${{ env.AUTH_IMAGE_NAME }}:prod -f Dockerfile-auth .
           
-          # 2. Gateway Image Build
+          # [수정] 파일명 하이픈(-) 확인: Dockerfile-gateway
           docker build -t ${{ env.GATEWAY_IMAGE_NAME }}:prod -f Dockerfile-gateway .
 
       - name: Prepare & Execute Deployment
         run: |
-          echo "📂 Preparing deployment directory..."
           mkdir -p ${{ env.DEPLOY_PATH }}
           
           cp docker-compose.yml ${{ env.DEPLOY_PATH }}/
           cp scripts/deploy.sh ${{ env.DEPLOY_PATH }}/
           chmod +x ${{ env.DEPLOY_PATH }}/deploy.sh
           
-          # 환경 변수 설정 (prod 고정)
-          TARGET_ENV="prod"
-          
-          echo "🚀 Executing deploy.sh for $TARGET_ENV..."
+          # 무조건 prod 환경으로 실행
           cd ${{ env.DEPLOY_PATH }}
-          ./deploy.sh $TARGET_ENV
+          ./deploy.sh prod
 
       - name: Cleanup Docker
         run: docker image prune -f
