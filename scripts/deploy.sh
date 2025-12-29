@@ -13,7 +13,7 @@ fi
 
 # Prod 환경 설정
 ENV_FILE=".env.prod"
-NGINX_CONF="/etc/nginx/conf.d/tpa-admin.conf"
+NGINX_CONF="/etc/nginx/conf.d/tpa-admin-api.conf"
 DEFAULT_PORT="8095" # Gateway Prod 포트 A
 
 echo "🚀 ${APP_NAME} (PROD) 배포 시작..."
