@@ -1,5 +1,4 @@
 services:
-  # 1. Auth Service (내부망 전용)
   auth:
     image: ${AUTH_IMAGE}
     pull_policy: never
