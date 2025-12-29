@@ -22,10 +22,10 @@ jobs:
       - name: Build Docker Images
         run: |
           # 1. Auth Image Build
-          docker build -t ${{ env.AUTH_IMAGE_NAME }}:${{ github.ref_name }} -f Dockerfile-auth .
+          docker build -t tpa-admin-auth:prod -f Dockerfile-auth .
           
           # 2. Gateway Image Build
-          docker build -t ${{ env.GATEWAY_IMAGE_NAME }}:${{ github.ref_name }} -f Dockerfile-gateway .
+          docker build -t tpa-admin-gateway:prod  -f Dockerfile-gateway .
 
       - name: Prepare & Execute Deployment
         run: |

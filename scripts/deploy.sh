@@ -50,7 +50,10 @@ export GATEWAY_IMAGE="tpa-admin-gateway:prod"
 export COMPOSE_PROJECT_NAME="${APP_NAME}-prod-${TARGET_PORT}"
 
 echo "📦 컨테이너 세트 기동: ${COMPOSE_PROJECT_NAME}"
-docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME up -d
+docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME up -d || {
+    echo "❌ Docker Compose 실행 실패!"
+    exit 1
+}
 
 # 4. Health Check
 echo "🏥 Gateway 헬스체크: http://127.0.0.1:${TARGET_PORT}/actuator/health"
