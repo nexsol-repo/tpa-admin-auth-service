@@ -4,7 +4,7 @@
 TARGET_ENV=$1
 APP_NAME="tpa-gateway"
 ROUTE_PATH="/admin/" # Nginx에서 Gateway로 보낼 경로
-BASE_PATH="/home/nex3/app/tpa-admin-gateway"
+BASE_PATH="/home/nex3/app/tpa-admin-auth-api"
 
 if [ "$TARGET_ENV" != "prod" ]; then
   echo "⚠️ 현재 설정은 main 브랜치(prod) 배포만 지원합니다."
