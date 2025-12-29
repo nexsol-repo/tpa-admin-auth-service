@@ -29,7 +29,7 @@ public class AdminAuthService {
             throw new CoreException(CoreErrorType.INVALID_PASSWORD);
         }
 
-        return tokenIssuer.issueToken(user.id(), user.role().name(),user.serviceType());
+        return tokenIssuer.issueToken(user.id(), user.role().name(), user.serviceType());
     }
 
     public Long register(String loginId, String password, String name, AdminRole role, Set<ServiceType> serviceType) {
@@ -38,7 +38,7 @@ public class AdminAuthService {
         }
 
         String encoded = passwordEncoder.encode(password);
-        AdminUser user = AdminUser.createNew(loginId, encoded, name, role,serviceType);
+        AdminUser user = AdminUser.createNew(loginId, encoded, name, role, serviceType);
 
         return adminUserWriter.write(user).id();
     }

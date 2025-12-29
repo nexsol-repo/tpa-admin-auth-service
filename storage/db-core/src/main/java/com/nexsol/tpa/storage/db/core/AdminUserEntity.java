@@ -32,7 +32,6 @@ public class AdminUserEntity extends BaseEntity {
     @Column(name = "service_type")
     private String serviceType;
 
-
     public static AdminUserEntity fromDomain(AdminUser domain) {
         AdminUserEntity entity = new AdminUserEntity();
         entity.loginId = domain.loginId();
@@ -40,24 +39,22 @@ public class AdminUserEntity extends BaseEntity {
         entity.name = domain.name();
         entity.role = domain.role();
         entity.serviceType = domain.serviceType() != null
-                ? domain.serviceType().stream().map(Enum::name).collect(Collectors.joining(","))
-                : "";
+                ? domain.serviceType().stream().map(Enum::name).collect(Collectors.joining(",")) : "";
         return entity;
     }
 
     public AdminUser toDomain() {
         Set<ServiceType> services = StringUtils.hasText(this.serviceType)
-                ? Arrays.stream(this.serviceType.split(","))
-                .map(ServiceType::valueOf)
-                .collect(Collectors.toSet()) : Collections.emptySet();
+                ? Arrays.stream(this.serviceType.split(",")).map(ServiceType::valueOf).collect(Collectors.toSet())
+                : Collections.emptySet();
         return AdminUser.builder()
-                .id(this.getId())
-                .loginId(this.loginId)
-                .password(this.password)
-                .name(this.name)
-                .role(this.role)
-                .serviceType(services)
-                .build();
+            .id(this.getId())
+            .loginId(this.loginId)
+            .password(this.password)
+            .name(this.name)
+            .role(this.role)
+            .serviceType(services)
+            .build();
     }
 
 }

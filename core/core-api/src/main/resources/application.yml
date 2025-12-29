@@ -1,5 +1,5 @@
 spring.application.name: core-api
-spring.profiles.active: local-dev
+#spring.profiles.active: local-dev
 
 spring:
   config:
@@ -38,5 +38,5 @@ spring.config.activate.on-profile: staging
 
 
 ---
-spring.config.activate.on-profile: live
+spring.config.activate.on-profile: prod
 

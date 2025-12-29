@@ -8,7 +8,9 @@ import org.springframework.context.annotation.Import;
 @SpringBootApplication
 @Import(TokenModuleConfig.class)
 public class GatewayApplication {
+
     public static void main(String[] args) {
         SpringApplication.run(GatewayApplication.class, args);
     }
+
 }

@@ -5,8 +5,6 @@ import com.nexsol.tpa.core.enums.ServiceType;
 
 import java.util.Set;
 
-public record RegisterRequest(
-        String loginId, String password
-        , String name, AdminRole role, Set<ServiceType> serviceType
-        ) {
+public record RegisterRequest(String loginId, String password, String name, AdminRole role,
+        Set<ServiceType> serviceType) {
 }

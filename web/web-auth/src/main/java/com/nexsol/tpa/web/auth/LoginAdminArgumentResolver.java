@@ -1,6 +1,5 @@
 package com.nexsol.tpa.web.auth;
 
-
 import com.nexsol.tpa.core.enums.ServiceType;
 import jakarta.servlet.http.HttpServletRequest;
 import lombok.RequiredArgsConstructor;
@@ -22,7 +21,6 @@ import java.util.Set;
 @RequiredArgsConstructor
 public class LoginAdminArgumentResolver implements HandlerMethodArgumentResolver {
 
-
     @Override
     public boolean supportsParameter(MethodParameter parameter) {
         return parameter.hasParameterAnnotation(LoginAdmin.class)
@@ -32,7 +30,7 @@ public class LoginAdminArgumentResolver implements HandlerMethodArgumentResolver
 
     @Override
     public @Nullable Object resolveArgument(MethodParameter parameter, @Nullable ModelAndViewContainer mavContainer,
-                                            NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
+            NativeWebRequest webRequest, @Nullable WebDataBinderFactory binderFactory) throws Exception {
         HttpServletRequest request = (HttpServletRequest) webRequest.getNativeRequest();
 
         String userIdHeader = request.getHeader("X-User-Id");
@@ -53,7 +51,8 @@ public class LoginAdminArgumentResolver implements HandlerMethodArgumentResolver
             for (String scope : scopes) {
                 try {
                     serviceTypes.add(ServiceType.valueOf(scope.trim()));
-                } catch (IllegalArgumentException e) {
+                }
+                catch (IllegalArgumentException e) {
                     log.warn("Unknown ServiceType in header: {}", scope);
                 }
             }
@@ -61,8 +60,6 @@ public class LoginAdminArgumentResolver implements HandlerMethodArgumentResolver
 
         return new AdminUserProvider(userId, role, serviceTypes);
 
-
     }
-
 
 }

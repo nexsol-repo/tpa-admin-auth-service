@@ -24,18 +24,11 @@ public class AuthController {
         return ApiResponse.success(token);
     }
 
-
     @PostMapping("/register")
     public ApiResponse<Long> register(@RequestBody RegisterRequest request) {
-        Long userId = adminAuthService.register(
-                request.loginId(),
-                request.password(),
-                request.name(),
-                request.role(),
-                request.serviceType()
-        );
+        Long userId = adminAuthService.register(request.loginId(), request.password(), request.name(), request.role(),
+                request.serviceType());
         return ApiResponse.success(userId);
     }
-
 
 }

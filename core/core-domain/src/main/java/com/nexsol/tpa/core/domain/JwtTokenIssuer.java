@@ -17,10 +17,8 @@ public class JwtTokenIssuer implements TokenIssuer {
 
     @Override
     public String issueToken(Long id, String role, Set<ServiceType> serviceType) {
-        Set<String> scopes = serviceType.stream()
-                .map(Enum::name)
-                .collect(Collectors.toSet());
-        return jwtTokenProvider.generate(id, role,scopes,Map.of());
+        Set<String> scopes = serviceType.stream().map(Enum::name).collect(Collectors.toSet());
+        return jwtTokenProvider.generate(id, role, scopes, Map.of());
     }
 
 }

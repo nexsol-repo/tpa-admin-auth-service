@@ -23,7 +23,6 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
 
     private final JwtTokenProvider jwtTokenProvider;
 
-
     @Override
     public Mono<Void> filter(ServerWebExchange exchange, GatewayFilterChain chain) {
         ServerHttpRequest request = exchange.getRequest();
@@ -47,12 +46,13 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
 
             // 5. 헤더 변조 (뒷단 서비스에 유저 정보 전달)
             ServerHttpRequest modifiedRequest = request.mutate()
-                    .header("X-User-Id", String.valueOf(userId))
-                    .header("X-User-Role", role)
-                    .header("X-User-Scope", String.join(",", scopes))
-                    .build();
+                .header("X-User-Id", String.valueOf(userId))
+                .header("X-User-Role", role)
+                .header("X-User-Scope", String.join(",", scopes))
+                .build();
             return chain.filter(exchange.mutate().request(modifiedRequest).build());
-        } catch (IllegalAccessError e) {
+        }
+        catch (IllegalAccessError e) {
             log.warn("Token validation failed: {}", e.getMessage());
             return onError(exchange, HttpStatus.UNAUTHORIZED, "Invalid Token");
         }
@@ -77,4 +77,5 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
     public int getOrder() {
         return -1;
     }
+
 }

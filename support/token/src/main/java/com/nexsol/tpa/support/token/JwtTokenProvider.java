@@ -31,25 +31,29 @@ public class JwtTokenProvider {
         }
 
         return Jwts.builder()
-                .subject(String.valueOf(id))
-                .claims(finalClaims)
-                .issuer(jwtProperties.issuer())
-                .issuedAt(new Date(now))
-                .expiration(validity)
-                .signWith(key, Jwts.SIG.HS512)
-                .compact();
+            .subject(String.valueOf(id))
+            .claims(finalClaims)
+            .issuer(jwtProperties.issuer())
+            .issuedAt(new Date(now))
+            .expiration(validity)
+            .signWith(key, Jwts.SIG.HS512)
+            .compact();
     }
 
     private Claims parseClaims(String token) {
         try {
             return Jwts.parser().verifyWith(key).build().parseSignedClaims(token).getPayload();
-        } catch (SecurityException | MalformedJwtException e) {
+        }
+        catch (SecurityException | MalformedJwtException e) {
             throw new IllegalArgumentException("잘못된 JWT 서명입니다.");
-        } catch (ExpiredJwtException e) {
+        }
+        catch (ExpiredJwtException e) {
             throw new IllegalArgumentException("만료된 JWT 토큰입니다.");
-        } catch (UnsupportedJwtException e) {
+        }
+        catch (UnsupportedJwtException e) {
             throw new IllegalArgumentException("지원되지 않는 JWT 토큰입니다.");
-        } catch (IllegalArgumentException e) {
+        }
+        catch (IllegalArgumentException e) {
             throw new IllegalArgumentException("JWT 토큰이 잘못되었습니다.");
         }
     }
