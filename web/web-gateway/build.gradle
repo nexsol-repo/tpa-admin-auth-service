@@ -11,7 +11,8 @@ jar {
 
 dependencies {
     implementation project(':support:token')
-    implementation 'org.springframework.cloud:spring-cloud-starter-gateway:4.3.3'
+//    implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webmvc'
+    implementation 'org.springframework.cloud:spring-cloud-starter-gateway-server-webflux'
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
 
 
