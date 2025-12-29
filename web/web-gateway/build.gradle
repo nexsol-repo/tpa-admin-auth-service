@@ -1,5 +1,13 @@
-bootJar.enabled = true
-jar.enabled = false
+bootJar {
+    enabled = true
+    // plain jar 생성 방지 (혼란 방지)
+    archiveClassifier.set('')
+}
+
+jar {
+    enabled = false
+}
+
 
 dependencies {
     implementation project(':support:token')

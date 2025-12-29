@@ -79,7 +79,10 @@ for i in $(seq 1 $RETRIES); do
   if [ $i -eq $RETRIES ]; then
     echo "❌ 헬스체크 실패. 롤백을 위해 신규 컨테이너를 제거합니다."
     docker logs ${COMPOSE_PROJECT_NAME}-gateway --tail 50
+
+
     docker compose -p $COMPOSE_PROJECT_NAME down || true
+
     exit 1
   fi
 done
