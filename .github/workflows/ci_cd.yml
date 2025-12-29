@@ -24,10 +24,10 @@ jobs:
           echo "🐳 Building Docker Images with tag 'prod'..."
           
           # 1. Auth Image Build
-          docker build -t ${{ env.AUTH_IMAGE_NAME }}:prod -f Dockerfile.auth .
+          docker build -t ${{ env.AUTH_IMAGE_NAME }}:prod -f Dockerfile-auth .
           
           # 2. Gateway Image Build
-          docker build -t ${{ env.GATEWAY_IMAGE_NAME }}:prod -f Dockerfile.gateway .
+          docker build -t ${{ env.GATEWAY_IMAGE_NAME }}:prod -f Dockerfile-gateway .
 
       - name: Prepare & Execute Deployment
         run: |
