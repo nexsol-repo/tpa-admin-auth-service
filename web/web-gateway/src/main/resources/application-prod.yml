@@ -39,7 +39,9 @@ management:
     web:
       base-path: /v1/admin/actuator
       exposure:
-        include: health
+        include: health, gateway
   endpoint:
     health:
       show-details: always
+    gateway:
+      enabled: true
