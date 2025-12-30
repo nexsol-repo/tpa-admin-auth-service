@@ -66,7 +66,7 @@ RETRIES=10
 # bash 쉘 호환성을 위해 seq 사용
 for i in $(seq 1 $RETRIES); do
   # HTTP 상태 코드만 가져옴
-  STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:${TARGET_PORT}/admin/actuator/health)
+  STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:${TARGET_PORT}/v1/admin/actuator/health)
 
   if [ "$STATUS" == "200" ]; then
     echo "✅ 헬스체크 성공!"

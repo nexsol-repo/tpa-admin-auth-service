@@ -37,7 +37,7 @@ jwt:
 management:
   endpoints:
     web:
-      base-path: /admin/actuator
+      base-path: /v1/admin/actuator
       exposure:
         include: health
   endpoint:
