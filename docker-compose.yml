@@ -34,7 +34,7 @@ services:
       - JWT_SECRET=${JWT_SECRET}
       - AUTH_SERVICE_URL=http://auth:8081
       # 다른 서비스들 주소 (env나 하드코딩 필요)
-      - PUNGSU_SERVICE_URL=http://host.docker.internal:80/upstream/pungsu
+      - PUNGSU_SERVICE_URL=${PUNGSU_SERVICE_URL}
       # - SOLAR_SERVICE_URL=http://host.docker.internal:80/upstream/solar
     depends_on:
       - auth

@@ -91,6 +91,9 @@ done
 echo "🔄 Nginx 설정을 업데이트합니다..."
 # sudo 권한 문제 해결 전제하에 실행 (visudo 설정 필요)
 sudo sed -i "/location ${ROUTE_PATH//\//\\/}/,/}/ s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/" $NGINX_CONF
+
+sudo sed -i "/location \/actuator\//,/}/ s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/" $NGINX_CONF
+
 sudo nginx -t && sudo nginx -s reload
 
 # 6. 구 버전 제거
