@@ -93,6 +93,25 @@ for i in $(seq 1 $RETRIES); do
   fi
 done
 
+
+echo "🔄 [1] 최신 소스 코드 가져오기..."
+git pull origin main  # (브랜치명 확인 필요)
+
+echo "🏗️ [2] Docker 이미지 빌드 중..."
+# Dockerfile이 있는지 확인 후 빌드
+if [ -f "Dockerfile-auth" ]; then
+    docker build --no-cache -t tpa-admin-auth:prod -f Dockerfile-auth .
+else
+    echo "❌ Dockerfile-auth 파일이 없습니다! Git Pull이 제대로 되었는지 확인하세요."
+    exit 1
+fi
+
+# (Gateway도 필요하다면 동일하게 추가)
+# docker build -t tpa-admin-gateway:prod -f Dockerfile-gateway .
+
+echo "📦 [3] 컨테이너 재배포 시작..."
+docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME up -d
+
 # 5. Nginx 트래픽 전환
 echo "🔄 Nginx 설정을 업데이트합니다..."
 # sudo 권한 문제 해결 전제하에 실행 (visudo 설정 필요)
