@@ -54,6 +54,12 @@ export COMPOSE_PROJECT_NAME="${APP_NAME}-prod-${TARGET_PORT}"
 
 echo "📦 컨테이너 세트 기동: ${COMPOSE_PROJECT_NAME}"
 
+echo "🔨 Docker 이미지 새로 빌드 중..."
+
+docker build -t ${AUTH_IMAGE} -f Dockerfile-auth .
+
+docker build -t ${GATEWAY_IMAGE} -f Dockerfile-gateway .
+
 # docker-compose가 실패하면 스크립트 즉시 종료
 docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME up -d || {
     echo "❌ Docker Compose 실행 실패! 이미지가 존재하는지 확인하세요."
