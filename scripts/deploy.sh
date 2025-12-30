@@ -12,9 +12,6 @@ if [ "$TARGET_ENV" != "prod" ]; then
   exit 1
 fi
 
-# [수정 1] 작업 디렉토리로 확실하게 이동
-cd $BASE_PATH || { echo "❌ 경로가 존재하지 않습니다: $BASE_PATH"; exit 1; }
-
 # Prod 환경 설정
 ENV_FILE=".env.prod"
 NGINX_CONF="/etc/nginx/conf.d/tpa-admin-api.conf"
@@ -22,15 +19,9 @@ DEFAULT_PORT="8095"
 
 echo "🚀 ${APP_NAME} (PROD) 배포 시작..."
 
-# [수정 2] 순서 변경: 소스 코드를 제일 먼저 가져와야 함!
-echo "🔄 [1] 최신 소스 코드 가져오기..."
-git fetch --all
-git reset --hard origin/main
-git pull origin main
-
 # 1. 환경 파일 준비
-if [ -f "${ENV_FILE}" ]; then
-  cp "${ENV_FILE}" ".env"
+if [ -f "${BASE_PATH}/${ENV_FILE}" ]; then
+  cp "${BASE_PATH}/${ENV_FILE}" "${BASE_PATH}/.env"
 else
   echo "❌ .env.prod 파일이 없습니다. 서버에 파일을 생성해주세요."
   exit 1
@@ -42,6 +33,7 @@ if [ -f "$CURRENT_PORT_FILE" ]; then
     CURRENT_PORT=$(cat "$CURRENT_PORT_FILE")
 else
     CURRENT_PORT="$DEFAULT_PORT"
+    # 최초 배포 시 파일 생성
     echo "$DEFAULT_PORT" > "$CURRENT_PORT_FILE"
 fi
 
@@ -52,41 +44,28 @@ else
 fi
 echo "🔄 Gateway 포트 스위칭: ${CURRENT_PORT} -> ${TARGET_PORT}"
 
-# 3. 컨테이너 기동 준비
+# 3. 컨테이너 기동
 export HOST_PORT=$TARGET_PORT
 export TARGET_ENV="prod"
+# [중요] ci_cd.yml에서 빌드한 태그와 정확히 일치해야 함
 export AUTH_IMAGE="tpa-admin-auth:prod"
 export GATEWAY_IMAGE="tpa-admin-gateway:prod"
 export COMPOSE_PROJECT_NAME="${APP_NAME}-prod-${TARGET_PORT}"
 
-echo "📦 컨테이너 세트 준비: ${COMPOSE_PROJECT_NAME}"
+echo "📦 컨테이너 세트 기동: ${COMPOSE_PROJECT_NAME}"
 
-# [수정 3] Docker 이미지 빌드 (코드가 있으므로 이제 성공함)
-echo "🔨 [2] Docker 이미지 새로 빌드 중..."
-
-if [ -f "Dockerfile-auth" ]; then
-    # --no-cache 옵션 추가 (확실한 갱신)
-    docker build --no-cache -t ${AUTH_IMAGE} -f Dockerfile-auth .
-else
-    echo "❌ Dockerfile-auth 파일이 없습니다!"
-    exit 1
-fi
-
-# (Gateway Dockerfile이 있다면 주석 해제)
-# if [ -f "Dockerfile-gateway" ]; then
-#    docker build --no-cache -t ${GATEWAY_IMAGE} -f Dockerfile-gateway .
-# fi
-
-echo "📦 [3] 컨테이너 기동..."
+# docker-compose가 실패하면 스크립트 즉시 종료
 docker compose -f docker-compose.yml -p $COMPOSE_PROJECT_NAME up -d || {
-    echo "❌ Docker Compose 실행 실패!"
+    echo "❌ Docker Compose 실행 실패! 이미지가 존재하는지 확인하세요."
     exit 1
 }
 
 # 4. Health Check
 echo "🏥 Gateway 헬스체크: http://127.0.0.1:${TARGET_PORT}/actuator/health"
 RETRIES=10
+# bash 쉘 호환성을 위해 seq 사용
 for i in $(seq 1 $RETRIES); do
+  # HTTP 상태 코드만 가져옴
   STATUS=$(curl -s -o /dev/null -w "%{http_code}" http://127.0.0.1:${TARGET_PORT}/actuator/health)
 
   if [ "$STATUS" == "200" ]; then
@@ -99,15 +78,20 @@ for i in $(seq 1 $RETRIES); do
 
   if [ $i -eq $RETRIES ]; then
     echo "❌ 헬스체크 실패. 롤백을 위해 신규 컨테이너를 제거합니다."
-    docker logs ${COMPOSE_PROJECT_NAME}-auth --tail 50
+    docker logs ${COMPOSE_PROJECT_NAME}-gateway --tail 50
+
+
     docker compose -p $COMPOSE_PROJECT_NAME down || true
+
     exit 1
   fi
 done
 
 # 5. Nginx 트래픽 전환
 echo "🔄 Nginx 설정을 업데이트합니다..."
+# sudo 권한 문제 해결 전제하에 실행 (visudo 설정 필요)
 sudo sed -i "/location ${ROUTE_PATH//\//\\/}/,/}/ s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/" $NGINX_CONF
+
 sudo sed -i "/location \/actuator\//,/}/ s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/" $NGINX_CONF
 
 sudo nginx -t && sudo nginx -s reload
