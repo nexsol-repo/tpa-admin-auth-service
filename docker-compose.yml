@@ -30,7 +30,7 @@ services:
     environment:
       - TZ=Asia/Seoul
       - SERVER_PORT=8080
-#      - SPRING_PROFILES_ACTIVE=${TARGET_ENV}
+      - SPRING_PROFILES_ACTIVE=${TARGET_ENV}
       - JWT_SECRET=${JWT_SECRET}
 #      - SPRING_CONFIG_NAME=web-gateway
       - AUTH_SERVICE_URL=${AUTH_SERVICE_URL}
