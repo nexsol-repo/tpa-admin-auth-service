@@ -1,6 +1,15 @@
 bootJar.enabled = true
 jar.enabled = false
 
+configurations {
+    all {
+        exclude group: 'org.springframework.boot', module: 'spring-boot-starter-webflux'
+        exclude group: 'org.springframework.cloud', module: 'spring-cloud-starter-gateway'
+        // 혹시 모르니 reactor-netty도 제외 (MVC는 Tomcat을 쓰므로)
+        exclude group: 'io.projectreactor.netty'
+    }
+}
+
 dependencies {
     implementation project(":core:core-enum")
     implementation project(":core:core-domain")
