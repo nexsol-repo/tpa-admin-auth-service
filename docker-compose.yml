@@ -1,7 +1,7 @@
 services:
   auth:
     image: ${AUTH_IMAGE}
-#    pull_policy: never
+    pull_policy: always
     container_name: ${COMPOSE_PROJECT_NAME}-auth
     restart: always
     env_file:
@@ -20,7 +20,7 @@ services:
   # 2. Gateway Service (외부 노출)
   gateway:
     image: ${GATEWAY_IMAGE}
-#    pull_policy: never
+    pull_policy: always
     container_name: ${COMPOSE_PROJECT_NAME}-gateway
     restart: always
     env_file:
