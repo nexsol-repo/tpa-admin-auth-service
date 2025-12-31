@@ -20,8 +20,8 @@ services:
   # 2. Gateway Service (외부 노출)
   gateway:
     image: ${GATEWAY_IMAGE}
-    extra_hosts:
-      - "host.docker.internal:host-gateway"
+#    extra_hosts:
+#      - "host.docker.internal:host-gateway"
     pull_policy: never
     container_name: ${COMPOSE_PROJECT_NAME}-gateway
     restart: always
