@@ -13,8 +13,8 @@ public class GatewayConfig {
     public RouteLocator customRouteLocator(RouteLocatorBuilder builder, ScopeCheckGatewayFilterFactory scopeCheckFactory) {
         // 환경변수 없으면 디폴트값 사용 (안전장치)
         String authUrl = System.getenv().getOrDefault("AUTH_SERVICE_URL", "http://auth:8081");
-        String pungsuUrl = System.getenv().getOrDefault("PUNGSU_SERVICE_URL", "http://host.docker.internal:80/upstream/pungsu/");
-        String memoUrl = System.getenv().getOrDefault("MEMO_SERVICE_URL","http://host.docker.internal:80/upstream/memo/");
+        String pungsuUrl = System.getenv().getOrDefault("PUNGSU_SERVICE_URL", "http://host.docker.internal:80/upstream/pungsu");
+        String memoUrl = System.getenv().getOrDefault("MEMO_SERVICE_URL","http://host.docker.internal:80/upstream/memo");
 
         return builder.routes()
                 .route("auth-service", r -> r.path("/v1/admin/auth/**").uri(authUrl))
