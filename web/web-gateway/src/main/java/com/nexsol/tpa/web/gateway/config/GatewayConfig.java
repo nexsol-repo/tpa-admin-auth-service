@@ -17,21 +17,19 @@ public class GatewayConfig {
         String memoUrl = System.getenv().getOrDefault("MEMO_SERVICE_URL","http://host.docker.internal:80/upstream/memo");
 
         return builder.routes()
-                // 1. Auth 서비스 라우팅
-                .route("auth-service", r -> r.path("/v1/admin/auth/**")
-                        .uri(authUrl))
+                .route("auth-service", r -> r.path("/v1/admin/auth/**").uri(authUrl))
 
-                // 2. 풍수 서비스 라우팅
+                // 1. Docs 경로를 서비스 경로보다 위에 배치 (필터 없음)
+                .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**").uri(pungsuUrl))
+
+                // 2. 그 외 풍수 서비스 경로 (필터 적용)
                 .route("pungsu-service", r -> r.path("/v1/admin/pungsu/**")
                         .filters(f -> f.filter(scopeCheckFactory.apply(c -> c.setRequiredScope("PUNGSU"))))
-                        .uri(pungsuUrl))
-                .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**") // Nginx가 가공한 경로와 일치시킴
                         .uri(pungsuUrl))
 
                 .route("memo-service", r -> r.path("/v1/admin/memo/**")
                         .filters(f -> f.filter(scopeCheckFactory.apply(c -> c.setRequiredScope("MEMO"))))
                         .uri(memoUrl))
-
                 .build();
     }
 }
