@@ -31,7 +31,8 @@ public class GatewayConfig {
             .route("memo-service", r -> r.path("/v1/admin/memo/**")
                 .filters(f -> f
                     // .stripPrefix(3) <-- 이 줄을 삭제하거나 주석 처리하세요.
-                    .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("MEMO"))))
+                    .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("MEMO")))
+                    .prefixPath("/upstream/memo"))
                 .uri(memoUrl))
 
             .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**").uri(pungsuUrl))
