@@ -29,7 +29,7 @@ public class JwtAuthGlobalFilter implements GlobalFilter, Ordered {
         ServerHttpRequest request = exchange.getRequest();
         String path = request.getURI().getPath();
 
-        if (path.startsWith("/v1/admin/auth")) {
+        if (path.startsWith("/v1/admin/auth") || path.contains("/docs/")) {
             return chain.filter(exchange);
         }
 
