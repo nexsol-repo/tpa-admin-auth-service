@@ -19,17 +19,15 @@ public class GatewayConfig {
         return builder.routes()
                 .route("auth-service", r -> r.path("/v1/admin/auth/**").uri(authUrl))
 
-                // 1. Docs 경로를 서비스 경로보다 위에 배치 (필터 없음)
-                .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**").uri(pungsuUrl))
-
-                // 2. 그 외 풍수 서비스 경로 (필터 적용)
                 .route("pungsu-service", r -> r.path("/v1/admin/pungsu/**")
-                        .filters(f -> f.filter(scopeCheckFactory.apply(c -> c.setRequiredScope("PUNGSU"))))
+                        .filters(f -> f
+                                .stripPrefix(3) // "/v1/admin/pungsu" 제거하여 "/upstream/pungsu/" 뒤에 붙임
+                                .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("PUNGSU"))))
                         .uri(pungsuUrl))
 
                 .route("memo-service", r -> r.path("/v1/admin/memo/**")
                         .filters(f -> f
-                                .stripPrefix(3) // "/v1/admin/memo" 3단계를 제거하고
+                                .stripPrefix(3) // "/v1/admin/memo" 제거하여 "/upstream/memo/" 뒤에 붙임
                                 .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("MEMO"))))
                         .uri(memoUrl))
                 .build();
