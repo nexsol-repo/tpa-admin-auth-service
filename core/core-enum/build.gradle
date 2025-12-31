@@ -1,0 +1,25 @@
+bootJar { enabled = false }
+jar { enabled = true }
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = project.group
+            artifactId = 'core-enum' // 에러 메시지에서 찾던 이름
+            version = project.version
+        }
+    }
+    repositories {
+        maven {
+            url = project.findProperty('NEXUS_URL')
+            allowInsecureProtocol = true
+            credentials {
+                username = project.findProperty('NEXUS_USERNAME')
+                password = project.findProperty('NEXUS_PASSWORD')
+            }
+        }
+    }
+}

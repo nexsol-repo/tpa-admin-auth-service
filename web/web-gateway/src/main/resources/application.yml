@@ -33,6 +33,16 @@ spring:
               args:
                 requiredScope: PUNGSU
 
+        - id: memo-service
+          uri: ${MEMO_SERVICE_URL}
+          predicates:
+            - Path=/v1/admin/memo/**
+          filters:
+            - name: ScopeCheck
+              args:
+                requiredScope: MEMO
+
+
         - id: solar-service
           uri: ${SOLAR_SERVICE_URL}
           predicates:

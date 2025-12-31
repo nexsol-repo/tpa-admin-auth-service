@@ -7,3 +7,29 @@ dependencies {
     // 2. 메타데이터 생성기 (yml 파일 작성 시 자동완성 지원, 빌드 시점에만 동작)
     annotationProcessor 'org.springframework.boot:spring-boot-configuration-processor'
 }
+
+bootJar { enabled = false }
+jar { enabled = true }
+
+apply plugin: 'maven-publish'
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+            groupId = project.group
+            artifactId = 'token' // 에러 메시지에서 찾던 이름
+            version = project.version
+        }
+    }
+    repositories {
+        maven {
+            url = project.findProperty('NEXUS_URL')
+            allowInsecureProtocol = true
+            credentials {
+                username = project.findProperty('NEXUS_USERNAME')
+                password = project.findProperty('NEXUS_PASSWORD')
+            }
+        }
+    }
+}

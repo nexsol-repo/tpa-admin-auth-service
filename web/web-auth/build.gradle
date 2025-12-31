@@ -22,12 +22,14 @@ publishing {
     }
     repositories {
         maven {
-            url = System.getenv('NEXUS_URL')
+            url = project.findProperty('NEXUS_URL')
+
+            allowInsecureProtocol = true
 
             credentials {
                 // 환경 변수(NEXUS_USERNAME, NEXUS_PASSWORD)에서 값을 읽어옵니다.
-                username = System.getenv('NEXUS_USERNAME')
-                password = System.getenv('NEXUS_PASSWORD')
+                username = project.findProperty('NEXUS_USERNAME')
+                password = project.findProperty('NEXUS_PASSWORD')
             }
         }
     }
