@@ -7,27 +7,28 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configurers.AbstractHttpConfigurer;
 import org.springframework.security.web.SecurityFilterChain;
 
-
 @Configuration
 @EnableWebSecurity
 public class SecurityConfig {
 
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
-        http
-                .csrf(AbstractHttpConfigurer::disable) // CSRF 끄기
-                .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인 끄기
-                .httpBasic(AbstractHttpConfigurer::disable) // Http Basic 끄기
+        http.csrf(AbstractHttpConfigurer::disable) // CSRF 끄기
+            .formLogin(AbstractHttpConfigurer::disable) // 폼 로그인 끄기
+            .httpBasic(AbstractHttpConfigurer::disable) // Http Basic 끄기
 
-                .authorizeHttpRequests(auth -> auth
-                        // 1. 로그인, 회원가입 등 인증 없이 접근할 경로
-                        .requestMatchers("/v1/admin/auth/**","/v1/admin/pungsu/docs/**").permitAll()
-                        // 2. 헬스체크 경로
-                        .requestMatchers("/actuator/**", "/v1/admin/actuator/**").permitAll()
-                        // 3. 나머지는 다 인증 필요
-                        .anyRequest().authenticated()
-                );
+            .authorizeHttpRequests(auth -> auth
+                // 1. 로그인, 회원가입 등 인증 없이 접근할 경로
+                .requestMatchers("/v1/admin/auth/**", "/v1/admin/pungsu/docs/**")
+                .permitAll()
+                // 2. 헬스체크 경로
+                .requestMatchers("/actuator/**", "/v1/admin/actuator/**")
+                .permitAll()
+                // 3. 나머지는 다 인증 필요
+                .anyRequest()
+                .authenticated());
 
         return http.build();
     }
+
 }
