@@ -25,7 +25,7 @@ public class GatewayConfig {
                 .route("pungsu-service", r -> r.path("/v1/admin/pungsu/**")
                         .filters(f -> f.filter(scopeCheckFactory.apply(c -> c.setRequiredScope("PUNGSU"))))
                         .uri(pungsuUrl))
-                .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**") // 경로 오타 수정 및 Nginx 연동 경로 확인
+                .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**") // Nginx가 가공한 경로와 일치시킴
                         .uri(pungsuUrl))
 
                 .route("memo-service", r -> r.path("/v1/admin/memo/**")
