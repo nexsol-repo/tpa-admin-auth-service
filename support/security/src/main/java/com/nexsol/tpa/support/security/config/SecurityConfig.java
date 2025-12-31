@@ -21,7 +21,7 @@ public class SecurityConfig {
 
                 .authorizeHttpRequests(auth -> auth
                         // 1. 로그인, 회원가입 등 인증 없이 접근할 경로
-                        .requestMatchers("/v1/admin/auth/**").permitAll()
+                        .requestMatchers("/v1/admin/auth/**","/admin/pungsu/docs/index.html").permitAll()
                         // 2. 헬스체크 경로
                         .requestMatchers("/actuator/**", "/v1/admin/actuator/**").permitAll()
                         // 3. 나머지는 다 인증 필요
