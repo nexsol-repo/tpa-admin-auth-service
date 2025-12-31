@@ -89,11 +89,18 @@ done
 
 # 5. Nginx 트래픽 전환
 echo "🔄 Nginx 설정을 업데이트합니다..."
-# /admin/ 경로의 포트 업데이트
-sudo sed -i "s|proxy_pass http://127.0.0.1:[0-9]\{4\}/v1/admin/|proxy_pass http://127.0.0.1:${TARGET_PORT}/v1/admin/|g" $NGINX_CONF
 
-# /v1/admin/actuator/ 경로의 포트 업데이트 (정규식 강화)
-sudo sed -i "s|proxy_pass http://127.0.0.1:[0-9]\{4\}/v1/admin/actuator/|proxy_pass http://127.0.0.1:${TARGET_PORT}/v1/admin/actuator/|g" $NGINX_CONF
+# /admin/ 경로의 포트 업데이트
+#sudo sed -i "s|proxy_pass http://127.0.0.1:[0-9]\{4\}/v1/admin/|proxy_pass http://127.0.0.1:${TARGET_PORT}/v1/admin/|g" $NGINX_CONF
+#
+## /v1/admin/actuator/ 경로의 포트 업데이트 (정규식 강화)
+#sudo sed -i "s|proxy_pass http://127.0.0.1:[0-9]\{4\}/v1/admin/actuator/|proxy_pass http://127.0.0.1:${TARGET_PORT}/v1/admin/actuator/|g" $NGINX_CONF
+
+
+# sudo 권한 문제 해결 전제하에 실행 (visudo 설정 필요)
+sudo sed -i "/location ${ROUTE_PATH//\//\\/}/,/}/ s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/" $NGINX_CONF
+
+sudo sed -i "/location \/actuator\//,/}/ s/127.0.0.1:[0-9]\{4\}/127.0.0.1:${TARGET_PORT}/" $NGINX_CONF
 
 sudo nginx -t && sudo nginx -s reload
 
