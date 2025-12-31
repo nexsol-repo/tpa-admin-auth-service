@@ -35,7 +35,7 @@ spring:
         - id: pungsu-docs
           uri: ${PUNGSU_SERVICE_URL}
           predicates:
-            - Path=/admin/pungsu/docs/**
+            - Path=/v1/admin/pungsu/docs/**
 
         - id: memo-service
           uri: ${MEMO_SERVICE_URL}
