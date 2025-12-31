@@ -28,7 +28,9 @@ public class GatewayConfig {
                         .uri(pungsuUrl))
 
                 .route("memo-service", r -> r.path("/v1/admin/memo/**")
-                        .filters(f -> f.filter(scopeCheckFactory.apply(c -> c.setRequiredScope("MEMO"))))
+                        .filters(f -> f
+                                .stripPrefix(3) // "/v1/admin/memo" 3단계를 제거하고
+                                .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("MEMO"))))
                         .uri(memoUrl))
                 .build();
     }
