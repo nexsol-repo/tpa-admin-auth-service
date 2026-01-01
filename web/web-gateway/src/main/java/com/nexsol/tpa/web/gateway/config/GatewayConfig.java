@@ -24,13 +24,14 @@ public class GatewayConfig {
 
             .route("pungsu-service", r -> r.path("/v1/admin/pungsu/**")
                 .filters(f -> f
-                    // .stripPrefix(3) <-- 이 줄을 삭제하거나 주석 처리하세요.
-                    .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("PUNGSU"))))
+                    // .stripPrefix(3)
+                    .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("PUNGSU")))
+                        .prefixPath("/upstream/pungsu"))
                 .uri(pungsuUrl))
 
             .route("memo-service", r -> r.path("/v1/admin/memo/**")
                 .filters(f -> f
-                    // .stripPrefix(3) <-- 이 줄을 삭제하거나 주석 처리하세요.
+                    // .stripPrefix(3)
                     .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("MEMO")))
                     .prefixPath("/upstream/memo"))
                 .uri(memoUrl))
