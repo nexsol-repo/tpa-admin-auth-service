@@ -36,8 +36,10 @@ public class GatewayConfig {
                     .prefixPath("/upstream/memo"))
                 .uri(memoUrl))
 
-            .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**").uri(pungsuUrl))
-            .build();
+                .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**")
+                        .filters(f -> f.prefixPath("/upstream/pungsu"))
+                        .uri(pungsuUrl))
+                .build();
     }
 
 }
