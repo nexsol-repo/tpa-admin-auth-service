@@ -25,7 +25,7 @@ public class GatewayConfig {
                         .filters(f -> f.prefixPath("/upstream/pungsu"))
                         .uri(pungsuUrl))
 
-                .route("pungsu-service", r -> r.path("/v1/admin/pungsu/**")
+                .route("pungsu-service", r -> r.path("/admin/pungsu/**")
                         .filters(f -> f
                                 // .stripPrefix(3)
                                 .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("PUNGSU")))
