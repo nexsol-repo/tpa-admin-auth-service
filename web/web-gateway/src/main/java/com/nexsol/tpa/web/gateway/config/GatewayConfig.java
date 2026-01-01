@@ -21,11 +21,11 @@ public class GatewayConfig {
 
         return builder.routes()
                 .route("auth-service", r -> r.path("/v1/admin/auth/**").uri(authUrl))
-                .route("pungsu-docs", r -> r.path("/v1/admin/pungsu/docs/**")
+                .route("pungsu-docs", r -> r.path("/admin/pungsu/docs/**")
                         .filters(f -> f.prefixPath("/upstream/pungsu"))
                         .uri(pungsuUrl))
 
-                .route("pungsu-service", r -> r.path("/admin/pungsu/**")
+                .route("pungsu-service", r -> r.path("/v1/admin/pungsu/**")
                         .filters(f -> f
                                 // .stripPrefix(3)
                                 .filter(scopeCheckFactory.apply(c -> c.setRequiredScope("PUNGSU")))
