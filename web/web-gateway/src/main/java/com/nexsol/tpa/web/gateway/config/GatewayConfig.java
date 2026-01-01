@@ -22,7 +22,16 @@ public class GatewayConfig {
         return builder.routes()
                 .route("auth-service", r -> r.path("/v1/admin/auth/**").uri(authUrl))
                 .route("pungsu-docs", r -> r.path("/admin/pungsu/docs/**")
-                        .filters(f -> f.prefixPath("/upstream/pungsu"))
+                        .filters(f -> f
+                                // 1. Docs는 인증/Scope 체크를 하지 않거나 느슨하게 할 수 있음 (필요하다면 scopeCheckFactory 제거)
+
+                                // 2. 경로 재작성: /admin/pungsu/docs/index.html -> /docs/index.html
+                                // (Pungsu Service 내부의 WebMvcConfig에서 /docs/** 를 매핑하고 있으므로)
+                                .rewritePath("/admin/pungsu/(?<segment>.*)", "/${segment}")
+
+                                // 3. Nginx 라우팅을 위한 Prefix 추가: /docs/index.html -> /upstream/pungsu/docs/index.html
+                                .prefixPath("/upstream/pungsu")
+                        )
                         .uri(pungsuUrl))
 
                 .route("pungsu-service", r -> r.path("/v1/admin/pungsu/**")
